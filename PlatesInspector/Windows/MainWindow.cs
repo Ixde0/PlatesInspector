@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -26,6 +27,8 @@ public unsafe class MainWindow : Window, IDisposable
     private string treeImagePath;
     private PlatesInspectorPlugin piPlugin;
 
+    private List<AdvPlateData> playersData = [];
+
     // We give this window a hidden ID using ##
     // So that the user will see "My Amazing Window" as window title,
     // but for ImGui the ID is "My Amazing Window##With a hidden ID"
@@ -44,15 +47,62 @@ public unsafe class MainWindow : Window, IDisposable
 
     public void Dispose() { }
 
+    public override void OnOpen()
+    {
+        Service.Log.Info("Opened plugin window");
+
+        var platesData = new List<AdvPlateData>();
+
+        var alliance = GroupManager.Instance()->GetGroup()->AllianceMembers.ToArray();
+        foreach (var index in Enumerable.Range(0, alliance.Length))
+        {
+            var alliancePlayer = alliance[index];
+            Service.Log.Info("Alliance member " + index + " -> name: " + alliancePlayer.NameString + ", contentId:" + alliancePlayer.ContentId);
+            platesData.Add(new AdvPlateData(alliancePlayer.NameString, alliancePlayer.ContentId));
+        }
+
+        var party = GroupManager.Instance()->GetGroup()->PartyMembers.ToArray();
+        foreach (var index in Enumerable.Range(0, party.Length))
+        {
+            var partyMember = party[index];
+            Service.Log.Info("Party member " + index + " -> name: " + partyMember.NameString + ", contentId:" + partyMember.ContentId);
+            platesData.Add(new AdvPlateData(partyMember.NameString, partyMember.ContentId));
+        }
+
+        this.playersData = platesData;
+    }
+
+
+    public struct AdvPlateData
+    {
+        public string playerName;
+        public ulong contentId;
+        public AdvPlateData(string playerName, ulong contentId)
+        {
+            this.playerName = playerName;
+            this.contentId = contentId;
+        }
+    }
+
     public override void Draw()
     {
-        // ImGui.Text($"The random config bool is {piPlugin.Configuration.SomePropertyToBeSavedAndWithADefault}");
+        // ImGui.Text($"The random config bool is {piPlugin.Configuration.SomePropertyToBeSavedAndWithADefault}")
 
         if (ImGui.Button("Log party & alliance"))
         {
             //piPlugin.ToggleConfigUI();
-            //ShowAdvPlate();
             ListPartyMembers();
+        }
+
+        foreach (var player in playersData)
+        {
+            if (player.contentId > 0)
+            {
+                if (ImGui.Button(player.playerName))
+                {
+                    ShowAdvPlate(player.contentId);
+                }
+            }
         }
 
         ImGui.Spacing();
@@ -80,10 +130,10 @@ public unsafe class MainWindow : Window, IDisposable
         return "Hello, im " + playerName + ", my lvl is: " + playerLvl;
     }
 
-    private unsafe void ShowAdvPlate()
+    private unsafe void ShowAdvPlate(ulong contentId)
     {
-        var player = PlayerState.Instance();
-        AgentCharaCard.Instance()->OpenCharaCard(player->ContentId);
+        // var player = PlayerState.Instance();
+        AgentCharaCard.Instance()->OpenCharaCard(contentId);
     }
 
     private unsafe void ListPartyMembers()
@@ -102,17 +152,19 @@ public unsafe class MainWindow : Window, IDisposable
 
 
         var alliance = GroupManager.Instance()->GetGroup()->AllianceMembers.ToArray();
-        foreach (var index in Enumerable.Range(0, alliance.Length)) {
-           var alliancePlayer = alliance[index];
-           var name = alliancePlayer.NameString;
-           Service.Log.Info("Alliance member " + index + " -> name: " + alliancePlayer.NameString + ", contentId:" + alliancePlayer.ContentId);
+        foreach (var index in Enumerable.Range(0, alliance.Length))
+        {
+            var alliancePlayer = alliance[index];
+            var name = alliancePlayer.NameString;
+            Service.Log.Info("Alliance member " + index + " -> name: " + alliancePlayer.NameString + ", contentId:" + alliancePlayer.ContentId);
         }
 
         var party = GroupManager.Instance()->GetGroup()->PartyMembers.ToArray();
-        foreach (var index in Enumerable.Range(0, party.Length)) {
-           var partyMember = party[index];
-           var name = partyMember.NameString;
-           Service.Log.Info("Party member " + index + " -> name: " + partyMember.NameString + ", contentId:" + partyMember.ContentId);
+        foreach (var index in Enumerable.Range(0, party.Length))
+        {
+            var partyMember = party[index];
+            var name = partyMember.NameString;
+            Service.Log.Info("Party member " + index + " -> name: " + partyMember.NameString + ", contentId:" + partyMember.ContentId);
         }
 
     }
