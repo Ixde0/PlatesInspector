@@ -1,0 +1,16 @@
+name: PlatesInspector
+author: Camille Ixde
+punchline: Inspect all adventure plates at once
+description: |-
+  Inspect all adventure plates at once
+
+  Works on players in:
+  - Party
+  - Alliance
+repo_url: https://github.com/Ixde0/PlatesInspector
+tags:
+  - adventure
+  - plates
+  - inspector
+category_tags:
+  - utility
