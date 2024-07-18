@@ -1,15 +1,28 @@
 ﻿using System;
+using System.Linq;
 using System.Numerics;
+using System.Text;
 using Dalamud.Interface.Internal;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
+using Dalamud.IoC;
+using Dalamud.Memory;
+using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
+using FFXIVClientStructs.FFXIV.Client.Game.Group;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using ImGuiNET;
+using Lumina.Excel.GeneratedSheets;
 
 namespace PlatesInspector.Windows;
 
-public class MainWindow : Window, IDisposable
+public unsafe class MainWindow : Window, IDisposable
 {
+
+    // private static AddonPartyList* AddonPartyList => (AddonPartyList*)Service.GameGui.GetAddonByName("_PartyList");
+
     private string treeImagePath;
     private PlatesInspectorPlugin piPlugin;
 
@@ -33,16 +46,18 @@ public class MainWindow : Window, IDisposable
 
     public override void Draw()
     {
-        ImGui.Text($"The random config bool is {piPlugin.Configuration.SomePropertyToBeSavedAndWithADefault}");
+        // ImGui.Text($"The random config bool is {piPlugin.Configuration.SomePropertyToBeSavedAndWithADefault}");
 
-        if (ImGui.Button("Show Settings"))
+        if (ImGui.Button("Log party & alliance"))
         {
-            piPlugin.ToggleConfigUI();
+            //piPlugin.ToggleConfigUI();
+            //ShowAdvPlate();
+            ListPartyMembers();
         }
 
         ImGui.Spacing();
 
-        ImGui.Text("Cute tree :3");
+        ImGui.Text(GetSomeInGameText());
         var treeImage = PlatesInspectorPlugin.TextureProvider.GetFromFile(treeImagePath).GetWrapOrDefault();
         if (treeImage != null)
         {
@@ -55,4 +70,57 @@ public class MainWindow : Window, IDisposable
             ImGui.Text("Image not found.");
         }
     }
+
+    private unsafe string GetSomeInGameText()
+    {
+        var player = PlayerState.Instance();
+        var playerName = player->CharacterNameString;
+        var playerLvl = player->CurrentLevel;
+
+        return "Hello, im " + playerName + ", my lvl is: " + playerLvl;
+    }
+
+    private unsafe void ShowAdvPlate()
+    {
+        var player = PlayerState.Instance();
+        AgentCharaCard.Instance()->OpenCharaCard(player->ContentId);
+    }
+
+    private unsafe void ListPartyMembers()
+    {
+        Service.Log.Info("Listing party and alliance members");
+
+        // foreach (var index in Enumerable.Range(0, 8))
+        // {
+
+        //     var player0 = AgentHUD.Instance()->PartyMembers[index];
+        //     var playerName = MemoryHelper.ReadSeStringNullTerminated((nint) player0.Name);
+        //     Service.Log.Info("Player " + index + " -> name: " + playerName.TextValue + ", contentId:" + player0.ContentId);
+
+        //     ImGui.Text(playerName.TextValue);
+        // }
+
+
+        var alliance = GroupManager.Instance()->GetGroup()->AllianceMembers.ToArray();
+        foreach (var index in Enumerable.Range(0, alliance.Length)) {
+           var alliancePlayer = alliance[index];
+           var name = alliancePlayer.NameString;
+           Service.Log.Info("Alliance member " + index + " -> name: " + alliancePlayer.NameString + ", contentId:" + alliancePlayer.ContentId);
+        }
+
+        var party = GroupManager.Instance()->GetGroup()->PartyMembers.ToArray();
+        foreach (var index in Enumerable.Range(0, party.Length)) {
+           var partyMember = party[index];
+           var name = partyMember.NameString;
+           Service.Log.Info("Party member " + index + " -> name: " + partyMember.NameString + ", contentId:" + partyMember.ContentId);
+        }
+
+    }
+
+    /*
+    Use AgentHUD
+It contains the ObjectID's and ContentID's of the party members in order
+It also has Alliance member ObjectID's
+*/
+
 }

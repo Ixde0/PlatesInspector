@@ -24,6 +24,7 @@ public sealed class PlatesInspectorPlugin : IDalamudPlugin
 
     public PlatesInspectorPlugin()
     {
+        PluginInterface.Create<Service>();
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
         // you might normally want to embed resources and load them from the manifest stream
