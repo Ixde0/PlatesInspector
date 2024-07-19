@@ -91,18 +91,18 @@ public unsafe class MainWindow : Window, IDisposable
 
         ImGui.Spacing();
 
-        ImGui.Text(GetSomeInGameText());
-        var treeImage = PlatesInspectorPlugin.TextureProvider.GetFromFile(treeImagePath).GetWrapOrDefault();
-        if (treeImage != null)
-        {
-            ImGuiHelpers.ScaledIndent(55f);
-            ImGui.Image(treeImage.ImGuiHandle, new Vector2(treeImage.Width, treeImage.Height));
-            ImGuiHelpers.ScaledIndent(-55f);
-        }
-        else
-        {
-            ImGui.Text("Image not found.");
-        }
+        // ImGui.Text(GetSomeInGameText());
+        // var treeImage = PlatesInspectorPlugin.TextureProvider.GetFromFile(treeImagePath).GetWrapOrDefault();
+        // if (treeImage != null)
+        // {
+        //     ImGuiHelpers.ScaledIndent(55f);
+        //     ImGui.Image(treeImage.ImGuiHandle, new Vector2(treeImage.Width, treeImage.Height));
+        //     ImGuiHelpers.ScaledIndent(-55f);
+        // }
+        // else
+        // {
+        //     ImGui.Text("Image not found.");
+        // }
     }
 
     private unsafe string GetSomeInGameText()
