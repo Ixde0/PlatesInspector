@@ -27,7 +27,9 @@ public unsafe class MainWindow : Window, IDisposable
     private string treeImagePath;
     private PlatesInspectorPlugin piPlugin;
 
-    private List<AdvPlateData> playersData = [];
+    private HashSet<AdvPlateData> playersData = [];
+    private HashSet<AdvPlateData> history = [];
+    private HashSet<AdvPlateData> currentlyShowing = [];
 
     // We give this window a hidden ID using ##
     // So that the user will see "My Amazing Window" as window title,
@@ -78,14 +80,18 @@ public unsafe class MainWindow : Window, IDisposable
             ReloadPlayers();
         }
 
-        foreach (var player in playersData)
+        if (ImGui.Button("History"))
         {
-            if (player.contentId > 0)
+            Service.Log.Info("Loading history. Players count: " + history.Count);
+            this.currentlyShowing = history;
+        }
+
+        foreach (var player in currentlyShowing)
+        {
+
+            if (ImGui.Button(player.playerName))
             {
-                if (ImGui.Button(player.playerName))
-                {
-                    ShowAdvPlate(player.contentId);
-                }
+                ShowAdvPlate(player.contentId);
             }
         }
 
@@ -120,16 +126,18 @@ public unsafe class MainWindow : Window, IDisposable
         AgentCharaCard.Instance()->OpenCharaCard(contentId);
     }
 
-    private void ReloadPlayers() {
+    private void ReloadPlayers()
+    {
         Service.Log.Info("Reloading players");
 
-        var platesData = new List<AdvPlateData>();
+        var platesData = new HashSet<AdvPlateData>();
 
         var alliance = GroupManager.Instance()->GetGroup()->AllianceMembers.ToArray();
         foreach (var index in Enumerable.Range(0, alliance.Length))
         {
             var alliancePlayer = alliance[index];
-            if (alliancePlayer.ContentId > 0) {
+            if (alliancePlayer.ContentId > 0)
+            {
                 //Service.Log.Info("Alliance member " + index + " -> name: " + alliancePlayer.NameString + ", contentId:" + alliancePlayer.ContentId);
                 platesData.Add(new AdvPlateData(alliancePlayer.NameString, alliancePlayer.ContentId));
             }
@@ -139,15 +147,21 @@ public unsafe class MainWindow : Window, IDisposable
         foreach (var index in Enumerable.Range(0, party.Length))
         {
             var partyMember = party[index];
-            if (partyMember.ContentId > 0) {
+            if (partyMember.ContentId > 0)
+            {
                 //Service.Log.Info("Party member " + index + " -> name: " + partyMember.NameString + ", contentId:" + partyMember.ContentId);
                 platesData.Add(new AdvPlateData(partyMember.NameString, partyMember.ContentId));
             }
         }
 
         this.playersData = platesData;
+        this.history.UnionWith(platesData);
+        this.currentlyShowing = this.playersData;
 
         Service.Log.Info("Found " + platesData.Count + " players");
     }
+
+    // TODO: 
+    //  - load enemies in frontlines
 
 }
