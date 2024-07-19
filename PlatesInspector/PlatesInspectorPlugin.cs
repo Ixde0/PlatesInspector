@@ -38,7 +38,7 @@ public sealed class PlatesInspectorPlugin : IDalamudPlugin
 
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
-            HelpMessage = "A useful message to display in /xlhelp"
+            HelpMessage = "Open PlatesInspector window"
         });
 
         PluginInterface.UiBuilder.Draw += DrawUI;
