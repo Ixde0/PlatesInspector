@@ -129,16 +129,20 @@ public unsafe class MainWindow : Window, IDisposable
         foreach (var index in Enumerable.Range(0, alliance.Length))
         {
             var alliancePlayer = alliance[index];
-            //Service.Log.Info("Alliance member " + index + " -> name: " + alliancePlayer.NameString + ", contentId:" + alliancePlayer.ContentId);
-            platesData.Add(new AdvPlateData(alliancePlayer.NameString, alliancePlayer.ContentId));
+            if (alliancePlayer.ContentId > 0) {
+                //Service.Log.Info("Alliance member " + index + " -> name: " + alliancePlayer.NameString + ", contentId:" + alliancePlayer.ContentId);
+                platesData.Add(new AdvPlateData(alliancePlayer.NameString, alliancePlayer.ContentId));
+            }
         }
 
         var party = GroupManager.Instance()->GetGroup()->PartyMembers.ToArray();
         foreach (var index in Enumerable.Range(0, party.Length))
         {
             var partyMember = party[index];
-            //Service.Log.Info("Party member " + index + " -> name: " + partyMember.NameString + ", contentId:" + partyMember.ContentId);
-            platesData.Add(new AdvPlateData(partyMember.NameString, partyMember.ContentId));
+            if (partyMember.ContentId > 0) {
+                //Service.Log.Info("Party member " + index + " -> name: " + partyMember.NameString + ", contentId:" + partyMember.ContentId);
+                platesData.Add(new AdvPlateData(partyMember.NameString, partyMember.ContentId));
+            }
         }
 
         this.playersData = platesData;
