@@ -78,7 +78,6 @@ public unsafe class MainWindow : Window, IDisposable
             ReloadPlayers();
         }
 
-
         foreach (var player in playersData)
         {
             if (player.contentId > 0)
