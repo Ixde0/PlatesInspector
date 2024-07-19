@@ -49,27 +49,7 @@ public unsafe class MainWindow : Window, IDisposable
 
     public override void OnOpen()
     {
-        Service.Log.Info("Opened plugin window");
-
-        var platesData = new List<AdvPlateData>();
-
-        var alliance = GroupManager.Instance()->GetGroup()->AllianceMembers.ToArray();
-        foreach (var index in Enumerable.Range(0, alliance.Length))
-        {
-            var alliancePlayer = alliance[index];
-            Service.Log.Info("Alliance member " + index + " -> name: " + alliancePlayer.NameString + ", contentId:" + alliancePlayer.ContentId);
-            platesData.Add(new AdvPlateData(alliancePlayer.NameString, alliancePlayer.ContentId));
-        }
-
-        var party = GroupManager.Instance()->GetGroup()->PartyMembers.ToArray();
-        foreach (var index in Enumerable.Range(0, party.Length))
-        {
-            var partyMember = party[index];
-            Service.Log.Info("Party member " + index + " -> name: " + partyMember.NameString + ", contentId:" + partyMember.ContentId);
-            platesData.Add(new AdvPlateData(partyMember.NameString, partyMember.ContentId));
-        }
-
-        this.playersData = platesData;
+        ReloadPlayers();
     }
 
 
@@ -88,11 +68,17 @@ public unsafe class MainWindow : Window, IDisposable
     {
         // ImGui.Text($"The random config bool is {piPlugin.Configuration.SomePropertyToBeSavedAndWithADefault}")
 
-        if (ImGui.Button("Log party & alliance"))
+        // if (ImGui.Button("Log party & alliance"))
+        // {
+        //     //piPlugin.ToggleConfigUI();
+        //     LogPartyMembers();
+        // }
+
+        if (ImGui.Button("Refresh"))
         {
-            //piPlugin.ToggleConfigUI();
-            ListPartyMembers();
+            ReloadPlayers();
         }
+
 
         foreach (var player in playersData)
         {
@@ -136,20 +122,9 @@ public unsafe class MainWindow : Window, IDisposable
         AgentCharaCard.Instance()->OpenCharaCard(contentId);
     }
 
-    private unsafe void ListPartyMembers()
+    private unsafe void LogPartyMembers()
     {
         Service.Log.Info("Listing party and alliance members");
-
-        // foreach (var index in Enumerable.Range(0, 8))
-        // {
-
-        //     var player0 = AgentHUD.Instance()->PartyMembers[index];
-        //     var playerName = MemoryHelper.ReadSeStringNullTerminated((nint) player0.Name);
-        //     Service.Log.Info("Player " + index + " -> name: " + playerName.TextValue + ", contentId:" + player0.ContentId);
-
-        //     ImGui.Text(playerName.TextValue);
-        // }
-
 
         var alliance = GroupManager.Instance()->GetGroup()->AllianceMembers.ToArray();
         foreach (var index in Enumerable.Range(0, alliance.Length))
@@ -169,10 +144,26 @@ public unsafe class MainWindow : Window, IDisposable
 
     }
 
-    /*
-    Use AgentHUD
-It contains the ObjectID's and ContentID's of the party members in order
-It also has Alliance member ObjectID's
-*/
+    private void ReloadPlayers() {
+        var platesData = new List<AdvPlateData>();
+
+        var alliance = GroupManager.Instance()->GetGroup()->AllianceMembers.ToArray();
+        foreach (var index in Enumerable.Range(0, alliance.Length))
+        {
+            var alliancePlayer = alliance[index];
+            // Service.Log.Info("Alliance member " + index + " -> name: " + alliancePlayer.NameString + ", contentId:" + alliancePlayer.ContentId);
+            platesData.Add(new AdvPlateData(alliancePlayer.NameString, alliancePlayer.ContentId));
+        }
+
+        var party = GroupManager.Instance()->GetGroup()->PartyMembers.ToArray();
+        foreach (var index in Enumerable.Range(0, party.Length))
+        {
+            var partyMember = party[index];
+            // Service.Log.Info("Party member " + index + " -> name: " + partyMember.NameString + ", contentId:" + partyMember.ContentId);
+            platesData.Add(new AdvPlateData(partyMember.NameString, partyMember.ContentId));
+        }
+
+        this.playersData = platesData;
+    }
 
 }
