@@ -33,7 +33,7 @@ public unsafe class MainWindow : Window, IDisposable
     // So that the user will see "My Amazing Window" as window title,
     // but for ImGui the ID is "My Amazing Window##With a hidden ID"
     public MainWindow(PlatesInspectorPlugin plugin, string imagePath)
-        : base("My Amazing Window##With a hidden ID", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+        : base("PlatesInspector##With a hidden ID", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         SizeConstraints = new WindowSizeConstraints
         {
@@ -121,13 +121,15 @@ public unsafe class MainWindow : Window, IDisposable
     }
 
     private void ReloadPlayers() {
+        Service.Log.Info("Reloading players");
+
         var platesData = new List<AdvPlateData>();
 
         var alliance = GroupManager.Instance()->GetGroup()->AllianceMembers.ToArray();
         foreach (var index in Enumerable.Range(0, alliance.Length))
         {
             var alliancePlayer = alliance[index];
-            // Service.Log.Info("Alliance member " + index + " -> name: " + alliancePlayer.NameString + ", contentId:" + alliancePlayer.ContentId);
+            //Service.Log.Info("Alliance member " + index + " -> name: " + alliancePlayer.NameString + ", contentId:" + alliancePlayer.ContentId);
             platesData.Add(new AdvPlateData(alliancePlayer.NameString, alliancePlayer.ContentId));
         }
 
@@ -135,11 +137,13 @@ public unsafe class MainWindow : Window, IDisposable
         foreach (var index in Enumerable.Range(0, party.Length))
         {
             var partyMember = party[index];
-            // Service.Log.Info("Party member " + index + " -> name: " + partyMember.NameString + ", contentId:" + partyMember.ContentId);
+            //Service.Log.Info("Party member " + index + " -> name: " + partyMember.NameString + ", contentId:" + partyMember.ContentId);
             platesData.Add(new AdvPlateData(partyMember.NameString, partyMember.ContentId));
         }
 
         this.playersData = platesData;
+
+        Service.Log.Info("Found " + platesData.Count + " players");
     }
 
 }
