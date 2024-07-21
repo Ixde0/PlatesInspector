@@ -2,4 +2,4 @@
 
 # PlatesInspector
 
-Hello
+Hello - this is my personal use only plugin for now.
